@@ -37,7 +37,7 @@ router.post('/signin', async (req, res) => {
 
     try {
         await user.comparePassword(password);
-        const token = jwt.sign({ userId: user._id}, process.env.MY_SECRET_KE);
+        const token = jwt.sign({ userId: user._id}, process.env.MY_SECRET_KEY);
         res.send({token});
     } catch (err){
         return res.status(422).send({error: 'Invalid password or email'});
