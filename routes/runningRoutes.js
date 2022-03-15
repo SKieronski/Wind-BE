@@ -36,4 +36,22 @@ router.post('/runroutes', async (req, res) => {
     }
 })
 
+router.delete('/runroutes/:id', async (req, res) => {
+    console.log("DELETING")
+    if(!req.params.id) {
+        // console.log("NO ID FOUND WHEN TRYING TO DELETE")
+        return res.status(422).send({error: "NO ID FOUND WHEN TRYING TO DELETE"})
+    }
+    try {
+        console.log("IN TRY")
+        const response = await RunRoute.findByIdAndDelete(req.params.id)
+        console.log("DELETED")
+        res.sendStatus(204)
+    } catch (err) {
+        console.log(err)
+        res.status(422).send({error: err.message})
+    }
+    
+})
+
 module.exports = router
