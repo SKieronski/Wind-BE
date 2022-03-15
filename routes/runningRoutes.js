@@ -9,15 +9,35 @@ const router = express.Router();
 router.use(requireAuth);
 
 router.get('/runroutes', async (req, res) => {
-    const runroutes = await RunRoute.find({userId: req.user._id});
+    try {
+        const runroutes = await RunRoute.find({userId: req.user._id});
+        res.send(runroutes);
+    } catch(err) {
+        res.status(422).send({error: err.message})
+    }
+    
+})
 
-    res.send(runroutes);
+router.get('/runroutes/one', async (req,res) => {
+    const {title, distance} = req.query;
+    try{
+        console.log("TRY")
+        const runroute = await RunRoute.findOne({
+            title: title,
+            distance: distance,
+        })
+        console.log(runroute)
+        res.send(runroute)
+    } catch (err) {
+        console.log(err)
+        res.status(422).send({error: err.message})
+    }  
 })
 
 router.post('/runroutes', async (req, res) => {
     const { title, distance, startPos, endPos } = req.body;
-    console.log(req.body);
     if(!title || !distance || !startPos || !endPos) {
+        console.log("INPUT WAS WRONG")
         return res.status(422).send({error: 'Request is not valid'})
     }
 
@@ -32,20 +52,17 @@ router.post('/runroutes', async (req, res) => {
         await newRoute.save();
         res.send(newRoute);
     } catch (err) {
+        console.log(err)
         res.status(422).send({error: err.message})
     }
 })
 
 router.delete('/runroutes/:id', async (req, res) => {
-    console.log("DELETING")
     if(!req.params.id) {
-        // console.log("NO ID FOUND WHEN TRYING TO DELETE")
         return res.status(422).send({error: "NO ID FOUND WHEN TRYING TO DELETE"})
     }
     try {
-        console.log("IN TRY")
-        const response = await RunRoute.findByIdAndDelete(req.params.id)
-        console.log("DELETED")
+        await RunRoute.findByIdAndDelete(req.params.id)
         res.sendStatus(204)
     } catch (err) {
         console.log(err)
